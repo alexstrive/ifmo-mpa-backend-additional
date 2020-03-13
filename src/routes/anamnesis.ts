@@ -33,7 +33,7 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
 
     return {
       age: getAge(patient.birth_date),
-      diseases: diseaseCases
+      records: diseaseCases
     };
   });
 
