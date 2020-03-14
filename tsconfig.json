@@ -7,6 +7,6 @@
     "baseUrl": "",
     "moduleResolution": "Node"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "packages/orm"],
   "exclude": ["node_modules"]
 }

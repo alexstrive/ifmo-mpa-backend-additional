@@ -5,4 +5,6 @@ const sequelize = new Sequelize(
   { logging: false, models: [__dirname + '/models'] }
 );
 
+// sequelize.query('DROP TYPE enum_patient_contradictions_level');
+
 export default sequelize;

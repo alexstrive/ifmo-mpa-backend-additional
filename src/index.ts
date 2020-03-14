@@ -2,18 +2,20 @@ require('dotenv').config();
 
 import { AddressInfo } from 'net';
 
-import orm from './orm';
+import orm from '../packages/orm';
 import anamnesis from './routes/anamnesis';
+import contradictions from './routes/contradictions';
 
 const fastify = require('fastify');
 const fastifyFormbody = require('fastify-formbody');
 
-const server = fastify({ logger: true });
+const server = fastify({ logger: process.env.PRODUCTION });
 
 server.register(fastifyFormbody);
 
 server.register(orm);
 server.register(anamnesis);
+server.register(contradictions);
 
 server.listen(3000, (err) => {
   if (err) {

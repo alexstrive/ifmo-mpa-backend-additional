@@ -4,7 +4,8 @@ import {
   DataType,
   PrimaryKey,
   Column,
-  ForeignKey
+  ForeignKey,
+  BelongsTo
 } from 'sequelize-typescript';
 
 import Disease from './Disease';
@@ -15,12 +16,18 @@ class Patient extends Model<Patient> {
   @Column
   id: number;
 
+  @Column
+  name: string;
+
   @Column(DataType.DATE)
   birth_date: Date;
 
   @ForeignKey(() => Disease)
   @Column
   disease_id: number;
+
+  @BelongsTo(() => Disease)
+  disease: Disease;
 
   @Column
   current_status_id: number;
