@@ -58,10 +58,13 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         required: ['patientId', 'reasonType', 'reasonId', 'substanceId'],
         properties: {
           patientId: { type: 'number' },
-          reasonType: { type: 'string' },
+          reasonType: {
+            type: 'string',
+            enum: ['SUBSTANCE', 'DISEASE', 'OTHER']
+          },
           reasonId: { type: 'number' },
           substanceId: { type: 'number' },
-          level: { type: 'string' }
+          level: { type: 'string', enum: ['LIGHT', 'AVERAGE', 'HIGH'] }
         }
       }
     }
@@ -79,17 +82,25 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         level
       } = request.body;
 
-      const patient = await Patient.findByPk(patientId);
+      let patient;
 
-      if (!patient) {
+      try {
+        patient = await Patient.findByPk(patientId, {
+          rejectOnEmpty: true
+        });
+      } catch (e) {
         throw new Error(
           `Patient with provided "patientId": ${patientId} not found`
         );
       }
 
-      const substance = await Substance.findByPk(substanceId);
+      let substance;
 
-      if (!substance) {
+      try {
+        substance = await Substance.findByPk(substanceId, {
+          rejectOnEmpty: true
+        });
+      } catch (e) {
         throw new Error(
           `Substance with provided "substanceId": ${substanceId} not found`
         );
@@ -102,6 +113,7 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         reasonType,
         level
       });
+
       return contradiction;
     }
   );
@@ -122,12 +134,6 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
     '/contradictions',
     deleteContradictionsOptions,
     async (request, reply) => {
-      //   const { recordId } = request.body;
-
-      //   const diseaseCase = await DiseaseCase.findByPk(recordId);
-
-      //   diseaseCase.destroy();
-
       return {};
     }
   );

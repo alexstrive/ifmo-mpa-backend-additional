@@ -1,20 +1,20 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize'
 
-import sequelize from './sequelize';
+import sequelize from './sequelize'
 
-const fastify = require('fastify');
-const fastifyPlugin = require('fastify-plugin');
+const fastify = require('fastify')
+const fastifyPlugin = require('fastify-plugin')
 
 declare module 'fastify' {
   class FastifyInstance {
-    sequelize: Sequelize;
+    sequelize: Sequelize
   }
 }
 
 const ORM = async (fastify, options) => {
-  await sequelize.sync();
+  await sequelize.sync()
 
-  fastify.decorate('sequelize', sequelize);
-};
+  fastify.decorate('sequelize', sequelize)
+}
 
-export default fastifyPlugin(ORM);
+export default fastifyPlugin(ORM)
