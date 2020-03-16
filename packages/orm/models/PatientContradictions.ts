@@ -9,9 +9,9 @@ import {
   Index,
   AutoIncrement,
   Default
-} from 'sequelize-typescript';
-import Patient from './Patient';
-import Substance from './Substance';
+} from 'sequelize-typescript'
+import Patient from './Patient'
+import Substance from './Substance'
 
 @Table({
   tableName: 'patient_contradictions'
@@ -19,37 +19,37 @@ import Substance from './Substance';
 class PatientContradictions extends Model {
   @AutoIncrement
   @Column
-  id!: number;
+  id!: number
 
   @BelongsTo(() => Patient, 'patientId')
-  patient!: Patient;
+  patient!: Patient
 
   @PrimaryKey
   @Index
   @ForeignKey(() => Patient)
   @Column
-  patientId!: number;
+  patientId!: number
 
   @PrimaryKey
   @Default('OTHER')
   @Column(DataType.ENUM('OTHER', 'SUBSTANCE', 'DISEASE'))
-  reasonType!: string;
+  reasonType!: string
 
   @PrimaryKey
   @Column
-  reasonId: number;
+  reasonId: number
 
   @Default('LIGHT')
   @Column(DataType.ENUM('LIGHT', 'AVERAGE', 'HIGH'))
-  level: string;
+  level: string
 
   @BelongsTo(() => Substance, 'substanceId')
-  substance: Substance;
+  substance: Substance
 
   @PrimaryKey
   @ForeignKey(() => Substance)
   @Column
-  substanceId: number;
+  substanceId: number
 }
 
-export default PatientContradictions;
+export default PatientContradictions

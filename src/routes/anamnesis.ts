@@ -5,7 +5,11 @@ import Patient from '@ifmo/orm/models/Patient'
 import DiseaseCase from '@ifmo/orm/models/DiseaseCase'
 import Disease from '@ifmo/orm/models/Disease'
 import PatientContradiction from '@ifmo/orm/models/PatientContradictions'
+import Substance from '@ifmo/orm/models/Substance'
+import ActiveSubstanceInMedicine from '@ifmo/orm/models/ActiveSubstanceInMedicine'
 
+import Status from '@ifmo/orm/models/Status'
+import Medicine from '@ifmo/orm/models/Medicine'
 const getAge = (birthday) => moment(Date.now()).diff(birthday, 'year')
 
 export default async (fastify: fastify.FastifyInstance, routeOptions) => {
@@ -24,14 +28,11 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
   fastify.get('/anamnesis', getAnamnesisOptions, async (request, reply) => {
     const { patientId } = request.query
 
-    const diseaseCases =
-      (await DiseaseCase.findAll({
-        where: { patientId },
-        attributes: ['id', 'state'],
-        include: [Disease]
-      })) || []
+    const patient = await Patient.findByPk(patientId, {
+      include: [{ model: DiseaseCase, as: 'anamnesis' }]
+    })
 
-    return diseaseCases
+    return patient.anamnesis
   })
 
   const postAnamnesisOptions: fastify.RouteShorthandOptions = {

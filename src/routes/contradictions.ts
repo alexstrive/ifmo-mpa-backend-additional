@@ -1,12 +1,17 @@
-import * as fastify from 'fastify';
+import ActiveSubstanceInMedicine from '@ifmo/orm/models/ActiveSubstanceInMedicine'
+import * as fastify from 'fastify'
 
-import { Op } from 'sequelize';
+import { Op } from 'sequelize'
 
-import Patient from '@ifmo/orm/models/Patient';
-import DiseaseCase from '@ifmo/orm/models/DiseaseCase';
-import Disease from '@ifmo/orm/models/Disease';
-import PatientContradiction from '@ifmo/orm/models/PatientContradictions';
-import Substance from '@ifmo/orm/models/Substance';
+import Patient from '@ifmo/orm/models/Patient'
+import DiseaseCase from '@ifmo/orm/models/DiseaseCase'
+import Disease from '@ifmo/orm/models/Disease'
+import Medicine from '@ifmo/orm/models/Medicine'
+import PatientContradictions from '@ifmo/orm/models/PatientContradictions'
+import Substance from '@ifmo/orm/models/Substance'
+import Status from '@ifmo/orm/models/Status'
+import DiseaseContradictions from '@ifmo/orm/models/DiseaseContradictions'
+import SubstanceContradictions from '@ifmo/orm/models/SubstanceContradictions'
 
 export default async (fastify: fastify.FastifyInstance, routeOptions) => {
   const getContradictionsOptions: fastify.RouteShorthandOptions = {
@@ -19,20 +24,25 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         }
       }
     }
-  };
+  }
 
   fastify.get(
     '/contradictions',
     getContradictionsOptions,
     async (request, reply) => {
-      const { patientId } = request.query;
+      const { patientId } = request.query
 
-      const contradictions = await PatientContradiction.findAll({
-        where: { patientId },
-        include: [Substance]
-      });
+      const patient = await Patient.findByPk(patientId, {
+        include: [
+          {
+            model: PatientContradictions,
+            as: 'contradictions',
+            include: [Substance]
+          }
+        ]
+      })
 
-      const result = contradictions.reduce(
+      const result = patient.contradictions.reduce(
         (others, contradiction) => [
           ...others,
           {
@@ -45,13 +55,13 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
           }
         ],
         []
-      );
+      )
 
-      return result;
+      return result
     }
-  );
+  )
 
-  const postContradictionsOptions: fastify.RouteShorthandOptions = {
+  const putContradictionsOptions: fastify.RouteShorthandOptions = {
     schema: {
       body: {
         type: 'object',
@@ -68,11 +78,11 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         }
       }
     }
-  };
+  }
 
-  fastify.post(
+  fastify.put(
     '/contradictions',
-    postContradictionsOptions,
+    putContradictionsOptions,
     async (request, reply) => {
       const {
         patientId,
@@ -80,43 +90,43 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         reasonType,
         substanceId,
         level
-      } = request.body;
+      } = request.body
 
-      let patient;
+      let patient
 
       try {
         patient = await Patient.findByPk(patientId, {
           rejectOnEmpty: true
-        });
+        })
       } catch (e) {
         throw new Error(
           `Patient with provided "patientId": ${patientId} not found`
-        );
+        )
       }
 
-      let substance;
+      let substance
 
       try {
         substance = await Substance.findByPk(substanceId, {
           rejectOnEmpty: true
-        });
+        })
       } catch (e) {
         throw new Error(
           `Substance with provided "substanceId": ${substanceId} not found`
-        );
+        )
       }
 
-      const contradiction = PatientContradiction.create({
+      const contradiction = PatientContradictions.create({
         patientId: patient.id,
         substanceId: substance.id,
         reasonId,
         reasonType,
         level
-      });
+      })
 
-      return contradiction;
+      return contradiction
     }
-  );
+  )
 
   const deleteContradictionsOptions: fastify.RouteShorthandOptions = {
     schema: {
@@ -128,13 +138,155 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         }
       }
     }
-  };
+  }
 
   fastify.delete(
     '/contradictions',
     deleteContradictionsOptions,
     async (request, reply) => {
-      return {};
+      return {}
     }
-  );
-};
+  )
+
+  const postContradictionsOptions: fastify.RouteShorthandOptions = {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['patientId'],
+        properties: {
+          patientId: { type: 'number' }
+        }
+      }
+    }
+  }
+
+  const contradictionStates = {
+    LIGHT: 0,
+    AVERAGE: 1,
+    HIGH: 2
+  }
+
+  const generateDiseaseContradictions = async (patient) => {
+    const diseaseContradictionsByStates = await Promise.all(
+      patient.anamnesis.map((diseaseCase) =>
+        DiseaseContradictions.findAll({
+          where: {
+            diseaseId: diseaseCase.diseaseId,
+            state: diseaseCase.state
+          },
+          raw: true
+        })
+      )
+    )
+
+    const flattenDiseaseContradictionsByStates: any = diseaseContradictionsByStates.reduce(
+      (acc: any, current) => acc.concat(current),
+      []
+    )
+
+    const result: any = flattenDiseaseContradictionsByStates.reduce(
+      (acc: any, contradiction: any, id, src) => {
+        if (
+          src.findIndex(
+            (item: any) =>
+              item.diseaseId === contradiction.diseaseId &&
+              contradictionStates[item.level] >
+                contradictionStates[contradiction.level]
+          ) !== -1
+        ) {
+          return acc
+        }
+
+        return [...acc, contradiction]
+      },
+      []
+    )
+
+    return result.map((contradiction) => ({
+      reasonType: 'DISEASE',
+      reasonId: contradiction.diseaseId,
+      patientId: Number.parseInt(patient.id),
+      substanceId: contradiction.withSubstanceId,
+      level: contradiction.level
+    }))
+  }
+
+  const generateSubstanceContradictions = async (patient) => {
+    const substanceIds = patient.status.medicines
+      .map((medicine) => medicine.substances)
+      .map((substances) =>
+        substances.map((substance) => substance.active_substance_id)
+      )
+      .flat()
+
+    const uniqueSubstanceIds = [...new Set(substanceIds)]
+
+    console.log(uniqueSubstanceIds)
+
+    const substanceContradictions = await Promise.all(
+      uniqueSubstanceIds.map((substanceId) =>
+        SubstanceContradictions.findAll({ where: { substanceId } })
+      )
+    )
+
+    // Polyfill for .flat
+    // Due inability to use this method
+    const result = substanceContradictions.reduce(
+      (acc, current) => acc.concat(current),
+      []
+    )
+
+    return result.map((contradiction) => ({
+      reasonType: 'SUBSTANCE',
+      reasonId: contradiction.substanceId,
+      patientId: Number.parseInt(patient.id),
+      substanceId: contradiction.withSubstanceId,
+      level: contradiction.level
+    }))
+  }
+
+  fastify.post(
+    '/contradictions',
+    postContradictionsOptions,
+    async (request, reply) => {
+      const { patientId } = request.body
+
+      const patient = await Patient.findByPk(patientId, {
+        include: [
+          { model: DiseaseCase, as: 'anamnesis' },
+          {
+            model: Status,
+            as: 'status',
+            include: [
+              {
+                model: Medicine,
+                include: [
+                  { model: ActiveSubstanceInMedicine, include: [Substance] }
+                ]
+              }
+            ]
+          },
+          { model: PatientContradictions, as: 'contradictions' }
+        ]
+      })
+
+      try {
+        await PatientContradictions.bulkCreate(
+          [
+            ...(await generateDiseaseContradictions(patient)),
+            ...(await generateSubstanceContradictions(patient))
+          ],
+          {
+            updateOnDuplicate: ['level']
+          }
+        )
+      } catch (e) {
+        console.log(e)
+      }
+
+      await patient.reload()
+
+      return patient.contradictions
+    }
+  )
+}

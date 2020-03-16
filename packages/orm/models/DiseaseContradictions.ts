@@ -20,6 +20,7 @@ class DiseaseContradictions extends Model {
   @BelongsTo(() => Disease, 'diseaseId')
   disease: Disease
 
+  @PrimaryKey
   @Column(DataType.ENUM('ACTIVE', 'HEALED'))
   state: string
 

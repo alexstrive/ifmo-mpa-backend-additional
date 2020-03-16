@@ -5,7 +5,8 @@
     "emitDecoratorMetadata": true,
     "outDir": "build/",
     "baseUrl": "",
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "lib": ["ES2019"]
   },
   "include": ["src/**/*", "packages/orm"],
   "exclude": ["node_modules"]
