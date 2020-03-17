@@ -17,11 +17,23 @@
   },
   "homepage": "https://github.com/alexstrive/ifmo-mpa-orm",
   "dependencies": {
+    "fastify": "2.12.1",
+    "fastify-plugin": "1.6.1",
     "sequelize": "5.21.5",
-    "sequelize-typescript": "^1.1.0",
-    "fastify": "2.12.1"
+    "sequelize-typescript": "^1.1.0"
+  },
+  "devDependencies": {
+    "husky": "4.2.3",
+    "typescript": "3.8.3"
   },
   "scripts": {
-    "start": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "yarn build",
+    "postpublish": "rm -r dist"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn publish"
+    }
   }
 }

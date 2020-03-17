@@ -1,9 +1,8 @@
 import { Sequelize } from 'sequelize'
 
 import sequelize from './sequelize'
-
-const fastify = require('fastify')
-const fastifyPlugin = require('fastify-plugin')
+import * as fastify from 'fastify'
+import * as fastifyPlugin from 'fastify-plugin'
 
 declare module 'fastify' {
   class FastifyInstance {

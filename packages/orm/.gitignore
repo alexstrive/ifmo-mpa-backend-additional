@@ -1,2 +1,4 @@
 yarn-error.log
 .npmrc
+dist/
+node_modules/
