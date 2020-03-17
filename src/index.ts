@@ -1,28 +1,30 @@
-require('dotenv').config();
+require('dotenv').config()
 
-import { AddressInfo } from 'net';
+import { AddressInfo } from 'net'
 
-import orm from '../packages/orm';
-import anamnesis from './routes/anamnesis';
-import contradictions from './routes/contradictions';
+import orm from '../packages/orm'
+import anamnesis from './routes/anamnesis'
+import contradictions from './routes/contradictions'
 
-const fastify = require('fastify');
-const fastifyFormbody = require('fastify-formbody');
+const fastify = require('fastify')
+const fastifyFormbody = require('fastify-formbody')
+const fastifyCors = require('fastify-cors')
 
-const server = fastify({ logger: process.env.PRODUCTION });
+const server = fastify({ logger: process.env.PRODUCTION })
 
-server.register(fastifyFormbody);
+server.register(fastifyFormbody)
+server.register(fastifyCors, { origin: /localhost.*/ })
 
-server.register(orm);
-server.register(anamnesis);
-server.register(contradictions);
+server.register(orm)
+server.register(anamnesis)
+server.register(contradictions)
 
-server.listen(3000, (err) => {
+server.listen(process.env.PORT, (err) => {
   if (err) {
-    server.log.error(err);
-    process.exit(1);
+    server.log.error(err)
+    process.exit(1)
   }
   server.log.info(
     `server listening on ${(server.server.address() as AddressInfo).port}`
-  );
-});
+  )
+})

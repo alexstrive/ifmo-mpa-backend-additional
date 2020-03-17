@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "outFile": "dist/index.ts",
+    "module": "amd",
+    "moduleResolution": "node"
+  }
+}

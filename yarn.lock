@@ -1304,6 +1304,14 @@ fast-safe-stringify@^2.0.7:
   resolved "https://registry.yarnpkg.com/fast-safe-stringify/-/fast-safe-stringify-2.0.7.tgz#124aa885899261f68aedb42a7c080de9da608743"
   integrity sha512-Utm6CdzT+6xsDk2m8S6uL8VHxNwI6Jub+e9NYTcAms28T84pTa25GJQV9j0CY0N1rM8hK4x6grpF2BQf+2qwVA==
 
+fastify-cors@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/fastify-cors/-/fastify-cors-3.0.2.tgz#38f380512da513ab5ae4b071756a3dfc461cca4a"
+  integrity sha512-emqorS6s4W0+v+ZbTwHUwpmT3R1rCQtIh3K69e+QUxbufkxvweJ5MbFrLTEyolMlOCOGAk8NcnUJBDd1aRceCw==
+  dependencies:
+    fastify-plugin "^1.6.0"
+    vary "^1.1.2"
+
 fastify-formbody@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/fastify-formbody/-/fastify-formbody-3.1.0.tgz#604cdafdb9e3af6068e6d9940985baf692d6e922"
@@ -1312,14 +1320,14 @@ fastify-formbody@^3.1.0:
     fastify-plugin "^1.0.0"
     qs "^6.5.1"
 
-fastify-plugin@^1.0.0, fastify-plugin@^1.6.1:
+fastify-plugin@^1.0.0, fastify-plugin@^1.6.0, fastify-plugin@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/fastify-plugin/-/fastify-plugin-1.6.1.tgz#122f5a5eeb630d55c301713145a9d188e6d5dd5b"
   integrity sha512-APBcb27s+MjaBIerFirYmBLatoPCgmHZM6XP0K+nDL9k0yX8NJPWDY1RAC3bh6z+AB5ULS2j31BUfLMT3uaZ4A==
   dependencies:
     semver "^6.3.0"
 
-fastify@^2.12.1:
+fastify@2.12.1, fastify@^2.12.1:
   version "2.12.1"
   resolved "https://registry.yarnpkg.com/fastify/-/fastify-2.12.1.tgz#2c203b6a939208143c781a4fb389436c30f6f4f1"
   integrity sha512-6WmLj8xfl1IIcBgt2tyvprnb9zIatxGMjm3xb2cWWIjqDgMw6NvFlq4MuHZAydTCk5j25DkpyUNQ/IyY+XVVuQ==
@@ -2780,6 +2788,11 @@ validator@^10.11.0:
   version "10.11.0"
   resolved "https://registry.yarnpkg.com/validator/-/validator-10.11.0.tgz#003108ea6e9a9874d31ccc9e5006856ccd76b228"
   integrity sha512-X/p3UZerAIsbBfN/IwahhYaBbY68EN/UQBWHtsbXGT5bfrH/p4NQzUCG1kF/rtKaNpnJ7jAu6NGTdSNtyNIXMw==
+
+vary@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
+  integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
 wkx@^0.4.8:
   version "0.4.8"

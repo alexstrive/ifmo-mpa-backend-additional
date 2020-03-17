@@ -1,17 +1,17 @@
-import ActiveSubstanceInMedicine from '@ifmo/orm/models/ActiveSubstanceInMedicine'
+import ActiveSubstanceInMedicine from '@alexstrive/ifmo-mpa-orm/models/ActiveSubstanceInMedicine'
 import * as fastify from 'fastify'
 
 import { Op } from 'sequelize'
 
-import Patient from '@ifmo/orm/models/Patient'
-import DiseaseCase from '@ifmo/orm/models/DiseaseCase'
-import Disease from '@ifmo/orm/models/Disease'
-import Medicine from '@ifmo/orm/models/Medicine'
-import PatientContradictions from '@ifmo/orm/models/PatientContradictions'
-import Substance from '@ifmo/orm/models/Substance'
-import Status from '@ifmo/orm/models/Status'
-import DiseaseContradictions from '@ifmo/orm/models/DiseaseContradictions'
-import SubstanceContradictions from '@ifmo/orm/models/SubstanceContradictions'
+import Patient from '@alexstrive/ifmo-mpa-orm/models/Patient'
+import DiseaseCase from '@alexstrive/ifmo-mpa-orm/models/DiseaseCase'
+import Disease from '@alexstrive/ifmo-mpa-orm/models/Disease'
+import Medicine from '@alexstrive/ifmo-mpa-orm/models/Medicine'
+import PatientContradictions from '@alexstrive/ifmo-mpa-orm/models/PatientContradictions'
+import Substance from '@alexstrive/ifmo-mpa-orm/models/Substance'
+import Status from '@alexstrive/ifmo-mpa-orm/models/Status'
+import DiseaseContradictions from '@alexstrive/ifmo-mpa-orm/models/DiseaseContradictions'
+import SubstanceContradictions from '@alexstrive/ifmo-mpa-orm/models/SubstanceContradictions'
 
 export default async (fastify: fastify.FastifyInstance, routeOptions) => {
   const getContradictionsOptions: fastify.RouteShorthandOptions = {

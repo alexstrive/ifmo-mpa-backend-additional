@@ -1,16 +1,7 @@
 import * as fastify from 'fastify'
-import * as moment from 'moment'
 
-import Patient from '@ifmo/orm/models/Patient'
-import DiseaseCase from '@ifmo/orm/models/DiseaseCase'
-import Disease from '@ifmo/orm/models/Disease'
-import PatientContradiction from '@ifmo/orm/models/PatientContradictions'
-import Substance from '@ifmo/orm/models/Substance'
-import ActiveSubstanceInMedicine from '@ifmo/orm/models/ActiveSubstanceInMedicine'
-
-import Status from '@ifmo/orm/models/Status'
-import Medicine from '@ifmo/orm/models/Medicine'
-const getAge = (birthday) => moment(Date.now()).diff(birthday, 'year')
+import Patient from '@alexstrive/ifmo-mpa-orm/models/Patient'
+import DiseaseCase from '@alexstrive/ifmo-mpa-orm/models/DiseaseCase'
 
 export default async (fastify: fastify.FastifyInstance, routeOptions) => {
   const getAnamnesisOptions: fastify.RouteShorthandOptions = {
@@ -39,28 +30,41 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
     schema: {
       body: {
         type: 'object',
-        required: ['patientId', 'diseaseId'],
+        required: ['patientId', 'cases'],
         properties: {
           patientId: { type: 'number' },
-          diseaseId: { type: 'number' },
-          state: { type: 'string' }
+          cases: {
+            type: 'array',
+            items: {
+              type: 'object',
+              required: ['diseaseId'],
+              properties: {
+                diseaseId: { type: 'number' },
+                state: { type: 'string' }
+              }
+            }
+          }
         }
       }
     }
   }
 
   fastify.post('/anamnesis', postAnamnesisOptions, async (request, reply) => {
-    const { patientId, diseaseId, state } = request.body
+    const { patientId, cases } = request.body
 
     const patient = await Patient.findByPk(patientId)
-    const disease = await Disease.findByPk(diseaseId)
 
-    const newCase = await DiseaseCase.create({ state })
+    DiseaseCase.destroy({ where: { patientId: patient.id } })
 
-    newCase.setPatient(patient)
-    newCase.setDisease(disease)
+    const newCases = DiseaseCase.bulkCreate(
+      cases.map((diseaseCase) => ({
+        patientId: Number.parseInt(patient.id),
+        diseaseId: diseaseCase.diseaseId,
+        state: diseaseCase.state
+      }))
+    )
 
-    return newCase
+    return newCases
   })
 
   const deleteAnamnesisOptions: fastify.RouteShorthandOptions = {
