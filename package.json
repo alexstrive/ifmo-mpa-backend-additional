@@ -1,7 +1,11 @@
 {
   "main": "src/index.ts",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "dependencies": {
-    "@alexstrive/ifmo-mpa-orm": "1.0.6",
+    "@alexstrive/ifmo-mpa-orm": "1.0.1",
     "@types/node": "^13.9.0",
     "dotenv": "^8.2.0",
     "fastify": "^2.12.1",
