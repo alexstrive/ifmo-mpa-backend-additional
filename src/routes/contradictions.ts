@@ -39,19 +39,25 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         ]
       })
 
-      const result = patient.contradictions.reduce(
-        (others, contradiction) => [
-          ...others,
-          {
-            reason: {
-              type: contradiction.reasonType,
-              id: contradiction.reasonId
-            },
-            substance: { id: contradiction.substance?.id },
-            level: contradiction.level
-          }
-        ],
-        []
+      const result = await Promise.all(
+        patient.contradictions.map(async (contradiction) => ({
+          reason: {
+            type: contradiction.reasonType,
+            id: contradiction.reasonId
+          },
+          substance: { id: Number.parseInt(contradiction.substance?.id) },
+          medicines: (
+            await ActiveSubstanceInMedicine.aggregate(
+              'medicine_id',
+              'DISTINCT',
+              {
+                plain: false,
+                where: { active_substance_id: contradiction.substance.id }
+              }
+            )
+          ).map((medicine) => Number.parseInt(medicine.DISTINCT)),
+          level: contradiction.level
+        }))
       )
 
       return result
