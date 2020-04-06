@@ -5,6 +5,7 @@ import { AddressInfo } from 'net'
 import orm from '../packages/orm'
 import anamnesis from './routes/anamnesis'
 import contradictions from './routes/contradictions'
+import sideEffects from './routes/sideEffects'
 
 const fastify = require('fastify')
 const fastifyFormbody = require('fastify-formbody')
@@ -18,6 +19,7 @@ server.register(fastifyCors, { origin: /localhost.*/ })
 server.register(orm)
 server.register(anamnesis)
 server.register(contradictions)
+server.register(sideEffects)
 
 server.listen(process.env.PORT, (err) => {
   if (err) {
