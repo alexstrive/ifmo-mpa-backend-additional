@@ -17,10 +17,10 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         type: 'object',
         required: ['patientId'],
         properties: {
-          patientId: { type: 'number' }
-        }
-      }
-    }
+          patientId: { type: 'number' },
+        },
+      },
+    },
   }
 
   fastify.get(
@@ -34,16 +34,16 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
           {
             model: PatientContradictions,
             as: 'contradictions',
-            include: [Substance]
-          }
-        ]
+            include: [Substance],
+          },
+        ],
       })
 
       const result = await Promise.all(
         patient.contradictions.map(async (contradiction) => ({
           reason: {
             type: contradiction.reasonType,
-            id: contradiction.reasonId
+            id: contradiction.reasonId,
           },
           substance: { id: Number.parseInt(contradiction.substance?.id) },
           medicines: (
@@ -52,11 +52,11 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
               'DISTINCT',
               {
                 plain: false,
-                where: { active_substance_id: contradiction.substance.id }
+                where: { active_substance_id: contradiction.substance.id },
               }
             )
           ).map((medicine) => Number.parseInt(medicine.DISTINCT)),
-          level: contradiction.level
+          level: contradiction.level,
         }))
       )
 
@@ -73,14 +73,14 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
           patientId: { type: 'number' },
           reasonType: {
             type: 'string',
-            enum: ['SUBSTANCE', 'DISEASE', 'OTHER']
+            enum: ['SUBSTANCE', 'DISEASE', 'OTHER'],
           },
           reasonId: { type: 'number' },
           substanceId: { type: 'number' },
-          level: { type: 'string', enum: ['LIGHT', 'AVERAGE', 'HIGH'] }
-        }
-      }
-    }
+          level: { type: 'string', enum: ['LIGHT', 'AVERAGE', 'HIGH'] },
+        },
+      },
+    },
   }
 
   fastify.put(
@@ -92,14 +92,14 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         reasonId,
         reasonType,
         substanceId,
-        level
+        level,
       } = request.body
 
       let patient
 
       try {
         patient = await Patient.findByPk(patientId, {
-          rejectOnEmpty: true
+          rejectOnEmpty: true,
         })
       } catch (e) {
         throw new Error(
@@ -111,7 +111,7 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
 
       try {
         substance = await Substance.findByPk(substanceId, {
-          rejectOnEmpty: true
+          rejectOnEmpty: true,
         })
       } catch (e) {
         throw new Error(
@@ -124,7 +124,7 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         substanceId: substance.id,
         reasonId,
         reasonType,
-        level
+        level,
       })
 
       return contradiction
@@ -137,10 +137,10 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         type: 'object',
         required: ['recordId'],
         properties: {
-          recordId: { type: 'number' }
-        }
-      }
-    }
+          recordId: { type: 'number' },
+        },
+      },
+    },
   }
 
   fastify.delete(
@@ -157,16 +157,16 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         type: 'object',
         required: ['patientId'],
         properties: {
-          patientId: { type: 'number' }
-        }
-      }
-    }
+          patientId: { type: 'number' },
+        },
+      },
+    },
   }
 
   const contradictionStates = {
     LIGHT: 0,
     AVERAGE: 1,
-    HIGH: 2
+    HIGH: 2,
   }
 
   const generateDiseaseContradictions = async (patient) => {
@@ -175,9 +175,9 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         DiseaseContradictions.findAll({
           where: {
             diseaseId: diseaseCase.diseaseId,
-            state: diseaseCase.state
+            state: diseaseCase.state,
           },
-          raw: true
+          raw: true,
         })
       )
     )
@@ -210,7 +210,7 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
       reasonId: contradiction.diseaseId,
       patientId: Number.parseInt(patient.id),
       substanceId: contradiction.withSubstanceId,
-      level: contradiction.level
+      level: contradiction.level,
     }))
   }
 
@@ -223,8 +223,6 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
       .flat()
 
     const uniqueSubstanceIds = [...new Set(substanceIds)]
-
-    console.log(uniqueSubstanceIds)
 
     const substanceContradictions = await Promise.all(
       uniqueSubstanceIds.map((substanceId) =>
@@ -244,7 +242,7 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
       reasonId: contradiction.substanceId,
       patientId: Number.parseInt(patient.id),
       substanceId: contradiction.withSubstanceId,
-      level: contradiction.level
+      level: contradiction.level,
     }))
   }
 
@@ -264,23 +262,27 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
               {
                 model: Medicine,
                 include: [
-                  { model: ActiveSubstanceInMedicine, include: [Substance] }
-                ]
-              }
-            ]
+                  { model: ActiveSubstanceInMedicine, include: [Substance] },
+                ],
+              },
+            ],
           },
-          { model: PatientContradictions, as: 'contradictions' }
-        ]
+          { model: PatientContradictions, as: 'contradictions' },
+        ],
       })
 
       try {
+        patient.contradictions.forEach((contradiction) =>
+          contradiction.destroy()
+        )
+
         await PatientContradictions.bulkCreate(
           [
             ...(await generateDiseaseContradictions(patient)),
-            ...(await generateSubstanceContradictions(patient))
+            ...(await generateSubstanceContradictions(patient)),
           ],
           {
-            updateOnDuplicate: ['level']
+            updateOnDuplicate: ['level'],
           }
         )
       } catch (e) {

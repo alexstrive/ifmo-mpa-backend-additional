@@ -8,15 +8,16 @@ import {
   DataType,
   Index,
   AutoIncrement,
-  Default
+  Default,
 } from 'sequelize-typescript'
 import Patient from './Patient'
 import Substance from './Substance'
 
 @Table({
-  tableName: 'patient_contradictions'
+  tableName: 'patient_contradictions',
 })
 class PatientContradictions extends Model {
+  @PrimaryKey
   @AutoIncrement
   @Column
   id!: number
@@ -24,18 +25,15 @@ class PatientContradictions extends Model {
   @BelongsTo(() => Patient, 'patientId')
   patient!: Patient
 
-  @PrimaryKey
   @Index
   @ForeignKey(() => Patient)
   @Column
   patientId!: number
 
-  @PrimaryKey
   @Default('OTHER')
   @Column(DataType.ENUM('OTHER', 'SUBSTANCE', 'DISEASE'))
   reasonType!: string
 
-  @PrimaryKey
   @Column
   reasonId: number
 
@@ -46,7 +44,6 @@ class PatientContradictions extends Model {
   @BelongsTo(() => Substance, 'substanceId')
   substance: Substance
 
-  @PrimaryKey
   @ForeignKey(() => Substance)
   @Column
   substanceId: number

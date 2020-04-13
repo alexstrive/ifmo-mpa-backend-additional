@@ -7,7 +7,7 @@ import {
   BelongsTo,
   Model,
   DataType,
-  Index
+  Index,
 } from 'sequelize-typescript'
 
 @Table({ tableName: 'disease_contradictions' })

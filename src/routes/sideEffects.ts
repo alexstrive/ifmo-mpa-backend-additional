@@ -93,12 +93,12 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
 
   fastify.put('/sideEffects', putSideEffectsOptions, async (request, reply) => {
     const { drugId, units, items } = request.body
-    const maxGroupId = await DrugSideEffects.max('group', { where: { drugId } })
+    const maxGroupId = (await DrugSideEffects.max('group')) || 0
 
     DrugSideEffects.bulkCreate(
       items.map((sideEffect) => ({
         drugId,
-        group: maxGroupId ? maxGroupId + 1 : 0,
+        group: maxGroupId + 1,
         sideEffectId: sideEffect.id,
         units,
         frequency: sideEffect.frequency,
