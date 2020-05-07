@@ -21,7 +21,7 @@ server.register(anamnesis)
 server.register(contradictions)
 server.register(sideEffects)
 
-server.listen(process.env.PORT, (err) => {
+server.listen(process.env.PORT, '0.0.0.0', (err) => {
   if (err) {
     server.log.error(err)
     process.exit(1)

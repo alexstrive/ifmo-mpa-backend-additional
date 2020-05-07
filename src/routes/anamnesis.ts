@@ -1,7 +1,7 @@
 import * as fastify from 'fastify'
 
-import Patient from '@alexstrive/ifmo-mpa-orm/models/Patient'
-import DiseaseCase from '@alexstrive/ifmo-mpa-orm/models/DiseaseCase'
+import Patient from '../../packages/orm/models/Patient'
+import DiseaseCase from '../../packages/orm/models/DiseaseCase'
 
 export default async (fastify: fastify.FastifyInstance, routeOptions) => {
   const getAnamnesisOptions: fastify.RouteShorthandOptions = {
@@ -10,17 +10,17 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         type: 'object',
         required: ['patientId'],
         properties: {
-          patientId: { type: 'number' }
-        }
-      }
-    }
+          patientId: { type: 'number' },
+        },
+      },
+    },
   }
 
   fastify.get('/anamnesis', getAnamnesisOptions, async (request, reply) => {
     const { patientId } = request.query
 
     const patient = await Patient.findByPk(patientId, {
-      include: [{ model: DiseaseCase, as: 'anamnesis' }]
+      include: [{ model: DiseaseCase, as: 'anamnesis' }],
     })
 
     return patient.anamnesis
@@ -40,13 +40,13 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
               required: ['diseaseId'],
               properties: {
                 diseaseId: { type: 'number' },
-                state: { type: 'string' }
-              }
-            }
-          }
-        }
-      }
-    }
+                state: { type: 'string' },
+              },
+            },
+          },
+        },
+      },
+    },
   }
 
   fastify.post('/anamnesis', postAnamnesisOptions, async (request, reply) => {
@@ -60,7 +60,7 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
       cases.map((diseaseCase) => ({
         patientId: Number.parseInt(patient.id),
         diseaseId: diseaseCase.diseaseId,
-        state: diseaseCase.state
+        state: diseaseCase.state,
       }))
     )
 
@@ -73,10 +73,10 @@ export default async (fastify: fastify.FastifyInstance, routeOptions) => {
         type: 'object',
         required: ['recordId'],
         properties: {
-          recordId: { type: 'number' }
-        }
-      }
-    }
+          recordId: { type: 'number' },
+        },
+      },
+    },
   }
 
   fastify.delete(

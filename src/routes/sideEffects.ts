@@ -1,7 +1,7 @@
 import * as fastify from 'fastify'
 
-import SideEffect from '@alexstrive/ifmo-mpa-orm/models/SideEffect'
-import DrugSideEffects from '@alexstrive/ifmo-mpa-orm/models/DrugSideEffects'
+import SideEffect from '../../packages/orm/models/SideEffect'
+import DrugSideEffects from '../../packages/orm/models/DrugSideEffects'
 
 export default async (fastify: fastify.FastifyInstance, routeOptions) => {
   const getSideEffects: fastify.RouteShorthandOptions = {
