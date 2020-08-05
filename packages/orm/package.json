@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/alexstrive/ifmo-mpa-orm",
   "dependencies": {
-    "fastify": "2.12.1",
+    "fastify": "2.15.1",
     "fastify-plugin": "1.6.1",
     "sequelize": "5.21.5",
     "sequelize-typescript": "^1.1.0"
